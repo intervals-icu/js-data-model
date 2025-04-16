@@ -1,0 +1,11 @@
+{
+  "name": "intervals-icu",
+  "version": "1.0.0",
+  "description": "Data model for custom Intervals.icu scripts",
+  "repository": "https://github.com/intervals-icu/js-data-model.git",
+  "types": "dist/index.d.ts",
+  "scripts": {
+  },
+  "author": "David Tinker",
+  "license": "MIT"
+}
