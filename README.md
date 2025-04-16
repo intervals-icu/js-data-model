@@ -2,7 +2,8 @@
 
 Data model for Javascript code for custom Intervals.icu fields, charts, streams etc. Generated from the 
 Intervals.icu source code. [Intervals.icu](https://intervals.icu/) is an online service for sports analytics and 
-planning with Javascript extension points and an Open API.
+planning with [Javascript extension points](https://forum.intervals.icu/t/extending-intervals-icu/46565) and an 
+[open API](https://forum.intervals.icu/t/intervals-icu-integration-cookbook/80090).
 
 This package just contains types and no code. Use it to write Intervals.icu scripts in your favourite IDE with code 
 completion. You still need to cut and paste the JS code into the Intervals.icu web app to run it.
@@ -41,3 +42,12 @@ Now create a Javascript file for your script (PedallingTime.js):
     }
 
 You should get code completion help from your IDE for all the types.
+
+## Intervals.icu JS extension points
+
+These are some of the places where Intervals.icu is extensible with JS:
+- [Computed activity fields](https://forum.intervals.icu/t/computed-activity-fields/25673)
+- [Custom interval fields](https://forum.intervals.icu/t/custom-interval-fields/25942)
+- [Custom activity streams with JS](https://forum.intervals.icu/t/custom-activity-streams-with-javascript/46416)
+- [Custom activity charts](https://forum.intervals.icu/t/custom-activity-charts/28627)
+
