@@ -1,5 +1,5 @@
 {
-  "name": "intervals-icu",
+  "name": "@intervals-icu/js-data-model",
   "version": "1.0.0",
   "description": "Data model for custom Intervals.icu scripts",
   "repository": "https://github.com/intervals-icu/js-data-model.git",
