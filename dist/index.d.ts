@@ -627,6 +627,8 @@ export interface Athlete {
     country?: string
     timezone?: string
     locale?: string
+    icu_resting_hr?: number
+    icu_weight?: number
     bio?: string
     website?: string
     icu_date_of_birth?: string
@@ -634,6 +636,7 @@ export interface Athlete {
     icu_form_as_percent?: boolean
     icu_mmp_days?: number
     icu_wellness_keys?: string[]
+    height?: number
 }
 
 /**
