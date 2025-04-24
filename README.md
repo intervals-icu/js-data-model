@@ -43,6 +43,10 @@ Now create a Javascript file for your script (PedallingTime.js):
 
 You should get code completion help from your IDE for all the types.
 
+To upgrade an existing project to the latest version:
+
+    npm install @intervals-icu/js-data-model@latest --save
+
 ## Intervals.icu JS extension points
 
 These are some of the places where Intervals.icu is extensible with JS:
