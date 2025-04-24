@@ -1,6 +1,6 @@
 {
   "name": "@intervals-icu/js-data-model",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Data model for custom Intervals.icu scripts",
   "repository": "https://github.com/intervals-icu/js-data-model.git",
   "types": "dist/index.d.ts",
