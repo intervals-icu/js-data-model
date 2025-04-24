@@ -21,7 +21,7 @@ Create a new directory for your Intervals.icu scripts project and install this p
     cd intervals-icu-scripts
     npm install @intervals-icu/js-data-model --save
 
-Open that project in your IDE and create a Typescript file, Types.js:
+Open that project in your IDE and create a Typescript file, Types.ts:
 
     import {ActivityJsData, Interval} from "@intervals-icu/js-data-model"
     export var icu: ActivityJsData
