@@ -720,76 +720,7 @@ export type CustomItemVisibility =  "PRIVATE" | "FOLLOWERS" | "PUBLIC";
  * ```
  */
 export interface JsDataCurveFactory {
-    getPowerCurve(key: string): JsPowerCurve | null
-    getHRCurve(key: string): JsHRCurve | null
-    getPaceCurve(key: string): JsPaceCurve | null
-}
-
-/**
- * A power duration curve.
- */
-export interface JsPowerCurve {
-    /** Time points. Note that not all seconds are included. The curve gets sparse as time goes out. */
-    secs?: number[]
-    /** Power for corresponding entry in secs. */
-    watts?: number[]
-    /** Power/weight for corresponding entry in secs. */
-    watts_per_kg?: number[]
-    /** Where corresponding point starts in the activity */
-    start_index?: number[]
-    /** Where corresponding point ends in the activity (exclusive) */
-    end_index?: number[]
-    /** If the curve is fatigued then this is the amount of work done before the curve. */
-    after_kj?: number
-    /** VO2max calculated from 5m watts/kg */
-    vo2max_5m?: number
-    /** Compound score calculated from 5m watts/kg */
-    compound_score_5m?: number
-    /** What is the index of the point on the curve that has a duration of at least seconds? Returns -1 if the curve
-     * is not that long. */
-    indexOf(seconds: number): number
-    getWatts(seconds: number): number | null
-    getWattsPerKg(seconds: number): number | null
-}
-
-/**
- * A heart rate duration curve.
- */
-export interface JsHRCurve {
-    /** Time points. Note that not all seconds are included. The curve gets sparse as time goes out. */
-    secs?: number[]
-    /** HR for corresponding entry in secs. */
-    bpm?: number[]
-    /** Where corresponding point starts in the activity */
-    start_index?: number[]
-    /** Where corresponding point ends in the activity (exclusive) */
-    end_index?: number[]
-    /** What is the index of the point on the curve that has a duration of at least seconds? Returns -1 if the curve
-     * is not that long. */
-    indexOf(seconds: number): number
-    getBpm(seconds: number): number | null
-}
-
-/**
- * A pace duration curve.
- */
-export interface JsPaceCurve {
-    /** Is this gradient adjusted pace? */
-    isGap?: boolean
-    /** Distance points. Note that not all distances are included. The curve gets sparse as time goes out. */
-    distance?: number[]
-    /** Time to cover the matching distance. */
-    secs?: number[]
-    /** Where corresponding point starts in the activity */
-    start_index?: number[]
-    /** Where corresponding point ends in the activity (exclusive) */
-    end_index?: number[]
-    /** What is the index of the point on the curve that has a distance of at least distance? Returns -1 if the curve
-     * is not that long. */
-    indexOf(distance: number): number
-    /** Returns speed in meters/second or null if curve not that long. Note that the distance might be more than the
-     * distance parameter. */
-    getSpeed(distance: number): number | null
+    [key: string]: JsPowerCurve | JsHRCurve | JsPaceCurve | null
 }
 
 /**
@@ -1038,6 +969,77 @@ export interface JsFitSDK {
      *         HRV_STATUS,
      *         NO_FLY_TIME_MODE */
     enumValueName(profileType: string, v: Number): string | null
+}
+
+/**
+ * A heart rate duration curve.
+ */
+export interface JsHRCurve {
+    /** Time points. Note that not all seconds are included. The curve gets sparse as time goes out. */
+    secs?: number[]
+    /** HR for corresponding entry in secs. */
+    bpm?: number[]
+    /** Where corresponding point starts in the activity */
+    start_index?: number[]
+    /** Where corresponding point ends in the activity (exclusive) */
+    end_index?: number[]
+    /** What is the index of the point on the curve that has a duration of at least seconds? Returns -1 if the curve
+     * is not that long. */
+    indexOf(seconds: number): number
+    getBpm(seconds: number): number | null
+}
+
+/**
+ * A pace duration curve.
+ */
+export interface JsPaceCurve {
+    /** Is this gradient adjusted pace? */
+    isGap?: boolean
+    /** Distance points. Note that not all distances are included. The curve gets sparse as time goes out. */
+    distance?: number[]
+    /** Time to cover the matching distance. */
+    secs?: number[]
+    /** Where corresponding point starts in the activity */
+    start_index?: number[]
+    /** Where corresponding point ends in the activity (exclusive) */
+    end_index?: number[]
+    /** What is the index of the point on the curve that has a distance of at least distance? Returns -1 if the curve
+     * is not that long. */
+    indexOf(distance: number): number
+    /** Returns speed in meters/second or null if curve not that long. Note that the distance might be more than the
+     * distance parameter. */
+    getSpeed(distance: number): number | null
+}
+
+/**
+ * A power duration curve.
+ */
+export interface JsPowerCurve {
+    /** Time points. Note that not all seconds are included. The curve gets sparse as time goes out. */
+    secs?: number[]
+    /** Power for corresponding entry in secs. */
+    watts?: number[]
+    /** Power/weight for corresponding entry in secs. */
+    watts_per_kg?: number[]
+    /** Where corresponding point starts in the activity */
+    start_index?: number[]
+    /** Where corresponding point ends in the activity (exclusive) */
+    end_index?: number[]
+    /** If the curve is fatigued then this is the amount of work done before the curve. */
+    after_kj?: number
+    /** Sub-maximal power curves, each entry in the array is a curve (null for single activity curve) */
+    submax_watts?: number[][]
+    /** Sub-maximal w/kg curves, each entry in the array is a curve (null for single activity curve) */
+    submax_watts_per_kg?: number[][]
+    /** VO2max calculated from 5m watts/kg */
+    vo2max_5m?: number
+    /** Compound score calculated from 5m watts/kg */
+    compound_score_5m?: number
+    /** What is the index of the point on the curve that has a duration of at least seconds? Returns -1 if the curve
+     * is not that long. */
+    indexOf(seconds: number): number
+    getWatts(seconds: number): number | null
+    getWattsPerKg(seconds: number): number | null
 }
 
 export interface JsStats {
