@@ -25,6 +25,9 @@ export interface Activity {
     icu_training_load?: number
     icu_atl?: number
     icu_ctl?: number
+    ss_p_max?: number
+    ss_w_prime?: number
+    ss_cp?: number
     paired_event_id?: number
     icu_ftp?: number
     icu_joules?: number
@@ -36,6 +39,7 @@ export interface Activity {
     /** Total joules of work / icu_recording_time */
     icu_average_watts?: number
     icu_variability_index?: number
+    strain_score?: number
     name?: string
     description?: string
     /** ISO-8601 UTC timezone e.g. 2022-12-28T05:56:38Z */
@@ -88,6 +92,7 @@ export interface Activity {
     icu_sync_date?: string
     analyzed?: string
     icu_w_prime?: number
+    p_max?: number
     threshold_pace?: number
     /** Max HR for each zone so last entry is athlete's max HR */
     icu_hr_zones?: number[]
@@ -132,6 +137,7 @@ export interface Activity {
     /** Seconds in each pace zone using gradient adjusted pace */
     gap_zone_times?: number[]
     use_gap_zone_times?: boolean
+    custom_zones?: ActivityZoneSet[]
     tiz_order?: ZoneOrder
     polarization_index?: number
     icu_achievements?: IcuAchievement[]
@@ -179,6 +185,7 @@ export interface Activity {
     pace_load_type?: PaceTssCalcType
     tags?: string[]
     attachments?: Attachment[]
+    /** When the user stopped the device in seconds since the start time */
     recording_stops?: number[]
     average_weather_temp?: number
     min_weather_temp?: number
@@ -214,7 +221,7 @@ export interface Activity {
     athlete_max_hr?: number
     /** Stride length in meters. */
     average_stride?: number
-    [key: string]: boolean | number | number[] | string | string[] | null | Attachment[] | StravaGear | HRRecovery | ActivityLap[] | Interval[]
+    [key: string]: boolean | number | number[] | string | string[] | null | Attachment[] | StravaGear | HRRecovery | ActivityLap[] | Interval[] | ActivityZoneSet[]
 }
 
 export type ActivitySubType =  "NONE" | "COMMUTE" | "WARMUP" | "COOLDOWN" | "RACE";
@@ -278,10 +285,12 @@ export interface Interval {
     decoupling?: number
     avg_lr_balance?: number
     average_dfa_a1?: number
-    average_respiration?: number
     average_epoc?: number
     wbal_start?: number
     wbal_end?: number
+    average_respiration?: number
+    average_tidal_volume?: number
+    average_tidal_volume_min?: number
     zone?: number
     zone_min_watts?: number
     zone_max_watts?: number
@@ -315,6 +324,10 @@ export interface Interval {
     average_yaw?: number
     headwind_percent?: number
     tailwind_percent?: number
+    strain_score?: number
+    ss_p_max?: number
+    ss_w_prime?: number
+    ss_cp?: number
     average_stride?: number
     id?: number
     type?: IntervalType
@@ -361,10 +374,12 @@ export interface IntervalGroup {
     decoupling?: number
     avg_lr_balance?: number
     average_dfa_a1?: number
-    average_respiration?: number
     average_epoc?: number
     wbal_start?: number
     wbal_end?: number
+    average_respiration?: number
+    average_tidal_volume?: number
+    average_tidal_volume_min?: number
     zone?: number
     zone_min_watts?: number
     zone_max_watts?: number
@@ -398,6 +413,10 @@ export interface IntervalGroup {
     average_yaw?: number
     headwind_percent?: number
     tailwind_percent?: number
+    strain_score?: number
+    ss_p_max?: number
+    ss_w_prime?: number
+    ss_cp?: number
     average_stride?: number
     id?: string
     count?: number
@@ -405,6 +424,23 @@ export interface IntervalGroup {
 
 export interface ZoneTime {
     id?: string
+    secs?: number
+}
+
+/**
+ * Time in zones for a set of custom zones.
+ */
+export interface ActivityZoneSet {
+    code?: string
+    zones?: ActivityZoneInfo[]
+}
+
+export interface ActivityZoneInfo {
+    id?: string
+    start?: number
+    end?: number
+    start_value?: number
+    end_value?: number
     secs?: number
 }
 
@@ -450,7 +486,7 @@ export interface HRRecovery {
 }
 
 export type ActivitySource =  "STRAVA" | "UPLOAD" | "MANUAL" | "GARMIN_CONNECT" | "OAUTH_CLIENT" | "DROPBOX" |
-    "POLAR" | "SUUNTO" | "COROS" | "WAHOO" | "ZWIFT";
+    "POLAR" | "SUUNTO" | "COROS" | "WAHOO" | "ZWIFT" | "ZEPP" | "CONCEPT2";
 
 export type HRLoadModelType =  "AVG_HR" | "HR_ZONES" | "HRSS";
 
@@ -475,6 +511,8 @@ export interface ActivityJsData {
     streams: ActivityStreamSet
     /** Weight, resting HR etc. on the day of the activity */
     wellness: Wellness
+    /** Planned workout or race paired with the activity */
+    pairedEvent: Event
     /** Messages from the fit file (only for activity fields and streams with 'Processes fit file messages' set) */
     fit?: JsFit
     /** Misc methods for looking up names for fit file values etc. */
@@ -538,8 +576,10 @@ export interface ActivityStreamSet {
     temp?: number[] | null
     torque?: number[] | null
     fixed_watts?: number[] | null
-    fixed_heartrate?: number[] | null
+    interpolated_watts?: number[] | null
     raw_watts?: number[] | null
+    fixed_heartrate?: number[] | null
+    interpolated_heartrate?: number[] | null
     raw_heartrate?: number[] | null
     left_right_balance?: number[] | null
     left_pedal_smoothness?: number[] | null
@@ -560,6 +600,11 @@ export interface ActivityStreamSet {
     skin_temperature?: number[] | null
     stride_length?: number[] | null
     w_bal?: number[] | null
+    mpa?: number[] | null
+    strain?: number[] | null
+    p_cp?: number[] | null
+    p_pmax?: number[] | null
+    p_wprime?: number[] | null
     respiration?: number[] | null
     tidal_volume?: number[] | null
     tidal_volume_min?: number[] | null
@@ -586,7 +631,7 @@ export interface ActivityStreamSet {
 export interface ActivityStream {
     type?: string
     name?: string
-    /** Integer[], Float[], Boolean[], int[] (fixed_watts), short[][] (hrv) */
+    /** Integer[], Float[], Boolean[], int[] (fixed_watts, interpolated_watts), short[][] (hrv) */
     data?: Object
     /** Float[] only for type latlng holding the longitude data (latitude is in data) */
     data2?: Object
@@ -635,6 +680,7 @@ export interface Athlete {
     icu_type_settings?: ActivityTypeSettings[]
     icu_form_as_percent?: boolean
     icu_mmp_days?: number
+    wellness_last_prompt_date?: string
     icu_wellness_keys?: string[]
     height?: number
 }
@@ -666,7 +712,8 @@ export type ActivityType =  "Ride" | "Run" | "Swim" | "WeightTraining" | "Hike" 
     "Pilates" | "Pickleball" | "Racquetball" | "Rugby" | "RockClimbing" | "RollerSki" | "Rowing" | "Sail" |
     "Skateboard" | "Snowboard" | "Snowshoe" | "Soccer" | "Squash" | "StairStepper" | "StandUpPaddling" |
     "Surfing" | "TableTennis" | "Tennis" | "TrailRun" | "Transition" | "Velomobile" | "VirtualRide" |
-    "VirtualRow" | "VirtualRun" | "WaterSport" | "Wheelchair" | "Windsurf" | "Workout" | "Yoga" | "Other";
+    "VirtualRow" | "VirtualRun" | "VirtualSki" | "WaterSport" | "Wheelchair" | "Windsurf" | "Workout" | "Yoga" |
+    "Other";
 
 /**
  * Information about a route for a specific athlete.
@@ -703,9 +750,82 @@ export interface CustomItem {
 
 export type CustomItemType =  "FITNESS_CHART" | "TRACE_CHART" | "INPUT_FIELD" | "ACTIVITY_FIELD" |
     "INTERVAL_FIELD" | "ACTIVITY_STREAM" | "ACTIVITY_CHART" | "ACTIVITY_HISTOGRAM" | "ACTIVITY_HEATMAP" |
-    "ACTIVITY_MAP" | "ACTIVITY_PANEL";
+    "ACTIVITY_MAP" | "ACTIVITY_PANEL" | "ZONES";
 
 export type CustomItemVisibility =  "PRIVATE" | "FOLLOWERS" | "PUBLIC";
+
+/**
+ * An event on a {@link IcuCalendar}.
+ */
+export interface Event {
+    id?: number
+    start_date_local?: string
+    icu_training_load?: number
+    icu_atl?: number
+    icu_ctl?: number
+    type?: string
+    carbs_used?: number
+    ss_p_max?: number
+    ss_w_prime?: number
+    ss_cp?: number
+    calendar_id?: number
+    uid?: string
+    athlete_id?: string
+    category?: EventCategory
+    end_date_local?: string
+    name?: string
+    description?: string
+    indoor?: boolean
+    color?: string
+    moving_time?: number
+    icu_ftp?: number
+    w_prime?: number
+    p_max?: number
+    atl_days?: number
+    ctl_days?: number
+    updated?: string
+    not_on_fitness_chart?: boolean
+    show_as_note?: boolean
+    show_on_ctl_line?: boolean
+    for_week?: boolean
+    target?: WorkoutTarget
+    joules?: number
+    joules_above_ftp?: number
+    workout_doc?: any
+    push_errors?: EventPushError[]
+    athlete_cannot_edit?: boolean
+    hide_from_athlete?: boolean
+    structure_read_only?: boolean
+    created_by_id?: string
+    shared_event_id?: number
+    entered?: boolean
+    carbs_per_hour?: number
+    sub_type?: ActivitySubType
+    tags?: string[]
+    attachments?: Attachment[]
+    oauth_client_id?: number
+    external_id?: string
+    load_target?: number
+    time_target?: number
+    distance_target?: number
+    plan_athlete_id?: string
+    plan_folder_id?: number
+    plan_workout_id?: number
+    plan_applied?: string
+    distance?: number
+    [key: string]: boolean | number | number[] | string | string[] | null | Attachment[]
+}
+
+export type EventCategory =  "WORKOUT" | "RACE_A" | "RACE_B" | "RACE_C" | "NOTE" | "PLAN" | "HOLIDAY" | "SICK" |
+    "INJURED" | "SET_EFTP" | "FITNESS_DAYS" | "SEASON_START" | "TARGET" | "SET_FITNESS";
+
+/**
+ * How should workouts be performed? Target power, HR or pace?
+ */
+export type WorkoutTarget =  "AUTO" | "POWER" | "HR" | "PACE";
+
+export interface EventPushError {
+}
 
 /**
  * Factory and cache for power, hr, GAP or pace curves for an athlete with a given start date.
@@ -1100,6 +1220,7 @@ export interface SportSettings {
     ftp?: number
     indoor_ftp?: number
     w_prime?: number
+    p_max?: number
     power_zones?: number[]
     sweet_spot_min?: number
     sweet_spot_max?: number
@@ -1142,6 +1263,12 @@ export interface SportSettings {
     show_pauses?: number
     ignore_velocity?: boolean
     default_workout_time?: string
+    /** Custom activity fields captured for this sport and copied onto activities */
+    custom_field_ids?: number[]
+    /** Captured custom activity field values by code */
+    custom_field_values?: any
+    /** Custom zones enabled for this sport */
+    custom_zones_ids?: number[]
 }
 
 /**
@@ -1223,6 +1350,8 @@ export interface Wellness {
 export interface WellnessFitnessSportInfo {
     type?: ActivityType
     eftp?: number
+    wPrime?: number
+    pMax?: number
 }
 
 export type MenstrualPhase =  "PERIOD" | "FOLLICULAR" | "OVULATING" | "LUTEAL" | "NONE";
